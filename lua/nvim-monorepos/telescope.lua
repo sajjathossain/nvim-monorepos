@@ -19,7 +19,7 @@ return function(directories_with_files)
 
   local enter = function(prompt_bufnr)
     local selected = action_state.get_selected_entry()
-    print(selected[2])
+    print(selected[1])
   end
 
   local attach_mappings = function(prompt_bufnr, map)
