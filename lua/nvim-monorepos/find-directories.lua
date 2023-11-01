@@ -45,7 +45,7 @@ local function findRootDirectoriesWithFiles(patterns)
 
   -- Define a helper function to check if a directory has files matching the file patterns
   local function hasFilesMatchingPatterns(directory, file_patterns)
-    for _, entry in vim.fn.readdir(directory) do
+    for _, entry in ipairs(vim.fn.readdir(directory)) do
       if entry ~= '.' and entry ~= '..' then
         local file_path = directory .. '/' .. entry
         if vim.fn.isdirectory(file_path) == 0 then
@@ -76,7 +76,7 @@ local function findRootDirectoriesWithFiles(patterns)
       table.insert(root_directories, directory)
     end
 
-    for _, subdirectory in vim.fn.readdir(directory) do
+    for _, subdirectory in ipairs(vim.fn.readdir(directory)) do
       local subdirectory_path = directory .. '/' .. subdirectory
       if vim.fn.isdirectory(subdirectory_path) == 1 and matchesDirectoryPattern(subdirectory, patterns.dir) then
         searchDirectories(subdirectory_path)
