@@ -5,6 +5,7 @@ return function(directories_with_files)
   local finders = require "telescope.finders"
   local pickers = require "telescope.pickers"
   local sorters = require("telescope.sorters")
+  local write = require("nvim-monorepos.write")
 
   local utils = require("nvim-monorepos.utils")
   local get_last_part_of_directory = utils.get_last_part_of_directory
@@ -19,7 +20,8 @@ return function(directories_with_files)
 
   local enter = function(prompt_bufnr)
     local selected = action_state.get_selected_entry()
-    print(selected[1])
+    write("output.txt", selected)
+    actions.close(prompt_bufnr)
   end
 
   local attach_mappings = function(prompt_bufnr, map)
