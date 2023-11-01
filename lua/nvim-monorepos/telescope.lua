@@ -18,7 +18,7 @@ return function(directories_with_files)
 
   for _, value in ipairs(directories_with_files) do
     local key = get_last_part_of_directory(value)
-    table.insert(M, { key, value })
+    table.insert(M, key)
   end
 
 
@@ -26,7 +26,6 @@ return function(directories_with_files)
     prompt_title = "Projects",
     finder = finders.new_table {
       results = M,
-      entry_marker = function(e) return { ordinal = e[1], display = e[1], value = e[1] } end
     },
     sorter = sorters.get_generic_fuzzy_sorter({}),
     previewer = false,
