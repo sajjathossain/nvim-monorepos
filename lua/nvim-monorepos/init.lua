@@ -10,9 +10,9 @@ local root_directories_with_files = nil
 -- ]]
 local setup = function(options)
   options = options or {
-    filePatterns = {}
+    patterns = {}
   }
-  local filePatterns = options.filePatterns
+  local filePatterns = options.patterns
 
 
   -- Usage example
