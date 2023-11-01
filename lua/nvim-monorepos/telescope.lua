@@ -5,7 +5,7 @@ return function(directories_with_files)
   local sorters = require("telescope.sorters")
   local entry_marker = function(entry)
     return {
-      value = entry,
+      value = entry[1],
       display = entry[1],
       ordinal = entry[1],
     }
