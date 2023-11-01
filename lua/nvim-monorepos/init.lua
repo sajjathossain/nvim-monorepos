@@ -1,8 +1,11 @@
 local setRootDirectory = require("nvim-monorepos.root")
-local findDirectories = require("nvim-monorepos.find-directories")
+local utils = require("nvim-monorepos.utils")
+local write = require("nvim-monorepos.write").writeOutput
 local telescope = require("nvim-monorepos.telescope")
 
+local get_subdirectories = utils.get_subdirectories
 local root_directories_with_files = nil
+local root = { ".git" }
 
 --[[
   setup function
@@ -15,24 +18,23 @@ local setup = function(options)
   local filePatterns = options.patterns
 
 
-  -- Usage example
   local patterns = {
-    file = { "project.json", "package.json" }, -- Replace with your file patterns
-    ignore = { ".git", "node_modules" },
-    dir = { "apps", "packages" }
+    file = { "project.json", "package.json", "README.md" }, -- Replace with your file patterns
+    ignore = { ".git", "node_modules", "**/build" },
   }
 
   if filePatterns and #filePatterns > 0 then
     patterns.file = filePatterns
   end
 
-  root_directories_with_files = findDirectories(patterns.file, patterns.dir, patterns.ignore)
-
   setRootDirectory()
+
+  local subdirs = get_subdirectories(vim.fn.getcwd(), patterns.ignore, patterns.file)
+  root_directories_with_files = subdirs
 end
 
 local show_list = function()
-  telescope(root_directories_with_files)
+  telescope(root_directories_with_files, root)
 end
 
 return {
