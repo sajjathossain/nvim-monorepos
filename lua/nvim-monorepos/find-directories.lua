@@ -79,9 +79,9 @@ local function findRootDirectoriesWithFiles(patterns)
 
     for _, subdirectory in ipairs(vim.fn.readdir(directory)) do
       local subdirectory_path = directory .. '/' .. subdirectory
-      if vim.fn.isdirectory(subdirectory_path) == 1 and matchesDirectoryPattern(subdirectory, patterns.dir) then
-        searchDirectories(subdirectory_path)
-      end
+      -- if vim.fn.isdirectory(subdirectory_path) == 1 and matchesDirectoryPattern(subdirectory, patterns.dir) then
+      searchDirectories(subdirectory_path)
+      -- end
     end
   end
 
