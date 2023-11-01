@@ -71,8 +71,8 @@ local function findRootDirectoriesWithFiles(patterns, ignore_patterns)
     return false
   end
   -- Check if the current directory matches any of the ignore patterns
-  local function matchesIgnorePattern(directory, igpatterns)
-    for _, pattern in ipairs(igpatterns) do
+  local function matchesIgnorePattern(directory)
+    for _, pattern in ipairs(ignore_patterns) do
       local regex_pattern = "^" .. pattern .. "$"
       if string.match(directory, regex_pattern) then
         return true
@@ -82,12 +82,13 @@ local function findRootDirectoriesWithFiles(patterns, ignore_patterns)
   end
   -- Recursively search for root directories that contain files matching the file pattern
   local function searchDirectories(directory)
+    if hasFilesMatchingPatterns(directory, patterns.file) and not matchesIgnorePattern(directory) then
+      table.insert(root_directories, directory)
+    end
+
     for _, subdirectory in ipairs(vim.fn.readdir(directory)) do
       local subdirectory_path = directory .. '/' .. subdirectory
-      if vim.fn.isdirectory(subdirectory_path) == 1 then
-        if hasFilesMatchingPatterns(subdirectory_path, patterns.file) and not matchesIgnorePattern(subdirectory, ignore_patterns) then
-          table.insert(directory, subdirectory_path)
-        end
+      if vim.fn.isdirectory(subdirectory_path) == 1 and matchesDirectoryPattern(subdirectory, patterns.dir) then
         searchDirectories(subdirectory_path)
       end
     end
