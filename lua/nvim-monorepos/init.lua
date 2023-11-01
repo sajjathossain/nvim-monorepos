@@ -26,7 +26,7 @@ local setup = function(options)
     patterns.file = filePatterns
   end
 
-  root_directories_with_files = findDirectories(patterns)
+  root_directories_with_files = findDirectories(patterns, patterns.ignore)
 
   setRootDirectory()
 end
