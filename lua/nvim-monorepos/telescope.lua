@@ -5,6 +5,7 @@ return function(directories_with_files)
   local finders = require "telescope.finders"
   local pickers = require "telescope.pickers"
   local telescope = require("telescope")
+  local builtin = require("telescope.builtin")
   local sorters = require("telescope.sorters")
 
   local utils = require("nvim-monorepos.utils")
@@ -23,10 +24,7 @@ return function(directories_with_files)
     local selected = action_state.get_selected_entry()
     local cwd = entries[selected]
     vim.fn.chdir(cwd)
-    telescope.find_files({
-      prompt_title = 'Find Files',
-      cwd = cwd, -- Replace with the directory path you want to search in
-    })
+    builtin.find_files({ cwd = cwd })
     actions.close(prompt_bufnr)
   end
 
