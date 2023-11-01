@@ -20,7 +20,6 @@ return function(directories_with_files)
 
   local enter = function(prompt_bufnr)
     local selected = action_state.get_selected_entry()
-    write("output.txt", selected)
     print(table.concat(selected, ""))
     actions.close(prompt_bufnr)
   end
