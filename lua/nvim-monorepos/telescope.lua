@@ -26,6 +26,13 @@ return function(directories_with_files)
     prompt_title = "Projects",
     finder = finders.new_table {
       results = M,
+      entry_maker = function(entry)
+        return {
+          value = entry,
+          display = entry[1],
+          ordinal = entry[1],
+        }
+      end
     },
     sorter = sorters.get_generic_fuzzy_sorter({}),
     previewer = false,
