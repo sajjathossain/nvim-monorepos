@@ -40,7 +40,7 @@ return function(directories_with_files)
           display = entry[1],
           ordinal = entry[1],
         }
-        return entry
+        return maker
       end
     },
     sorter = sorters.get_generic_fuzzy_sorter({}),
