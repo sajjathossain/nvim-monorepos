@@ -20,7 +20,7 @@ return function(directories_with_files)
 
   local enter = function(prompt_bufnr)
     local selected = action_state.get_selected_entry()
-    print(table.concat(selected, ""))
+    write(table.concat(selected, ""))
     actions.close(prompt_bufnr)
   end
 
@@ -37,7 +37,7 @@ return function(directories_with_files)
       entry_maker = function(entry)
         local maker = {
           value = entry,
-          display = entry[2],
+          display = entry[1],
           ordinal = entry[1],
         }
         return maker
