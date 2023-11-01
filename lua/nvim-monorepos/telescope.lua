@@ -1,11 +1,12 @@
 -- shows the outupt in telescope
 return function(directories_with_files)
-  local results = require("telescope.finder").new_table({
+  -- Convert the results to a format that Telescope.nvim can handle using finders.new_table
+  local results = require("telescope.finders").new_table {
     results = directories_with_files,
-  })
+  }
 
   -- Load Telescope.nvim and use the select function to display the results using the selector
-  require("telescope.builtin").find_files({
+  require("telescope.builtin").find_files {
     prompt_title = "Directories with Matching Files",
     entry_maker = function(entry)
       return {
@@ -26,5 +27,5 @@ return function(directories_with_files)
       return true
     end,
     results = results,
-  })
+  }
 end
