@@ -145,40 +145,43 @@ end
 ------------------------------------------------------------------------
 
 
-local function findSubdirectoriesWithFiles(files, ignore_patterns)
-  local subdirectories = {}
+local function findSubdirectoriesWithRootFile(root_files, ignore_patterns)
   local current_directory = vim.fn.getcwd()
+  local subdirectories = {}
 
-  -- Check if the current directory contains any of the specified files
-  local function hasFiles(dir)
-    for _, file in ipairs(files) do
-      local file_path = dir .. '/' .. file
-      if vim.fn.filereadable(file_path) == 1 then
-        return true
+  -- Check if the current directory contains a file in the root directory matching any of the specified regex patterns
+  local function hasRootFile(directory, rf)
+    for _, pattern in ipairs(rf) do
+      local regex_pattern = "^" .. pattern .. "$"
+      for _, entry in ipairs(vim.fn.readdir(directory)) do
+        local entry_path = directory .. '/' .. entry
+        if vim.fn.isdirectory(entry_path) == 0 and string.match(entry, regex_pattern) then
+          return true
+        end
       end
     end
     return false
   end
 
   -- Check if the current directory matches any of the ignore patterns
-  local function matchesIgnorePattern(dir, igp)
+  local function matchesIgnorePattern(directory, igp)
     for _, pattern in ipairs(igp) do
       local regex_pattern = "^" .. pattern .. "$"
-      if string.match(dir, regex_pattern) then
+      if string.match(directory, regex_pattern) then
         return true
       end
     end
     return false
   end
 
-  -- Recursively search for subdirectories with specific files
-  local function searchDirectories(dir)
-    if hasFiles(dir) and not matchesIgnorePattern(dir, ignore_patterns) then
-      table.insert(subdirectories, dir)
+  -- Recursively search for subdirectories with a file in the root directory matching regex
+  local function searchDirectories(directory)
+    if hasRootFile(directory, root_files) and not matchesIgnorePattern(directory, ignore_patterns) then
+      table.insert(subdirectories, directory)
     end
 
-    for _, subdirectory in ipairs(vim.fn.readdir(dir)) do
-      local subdirectory_path = dir .. '/' .. subdirectory
+    for _, subdirectory in ipairs(vim.fn.readdir(directory)) do
+      local subdirectory_path = directory .. '/' .. subdirectory
       if vim.fn.isdirectory(subdirectory_path) == 1 then
         searchDirectories(subdirectory_path)
       end
@@ -189,5 +192,4 @@ local function findSubdirectoriesWithFiles(files, ignore_patterns)
 
   return subdirectories
 end
-
-return findSubdirectoriesWithFiles
+return findSubdirectoriesWithRootFile
