@@ -13,7 +13,8 @@ return function(directories_with_files)
 
   for _, value in ipairs(directories_with_files) do
     local key = get_last_part_of_directory(value)
-    table.insert(M, { key, value })
+    -- table.insert(M, { key, value })
+    table.insert(M, key)
   end
 
   local enter = function(prompt_bufnr)
