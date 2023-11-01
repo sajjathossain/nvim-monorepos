@@ -23,7 +23,7 @@ return function(directories_with_files)
   end
 
 
-  pickers.new({}, {
+  finders.new({}, {
     prompt_title = "Projects",
     finder = finders.new_table {
       results = M,
