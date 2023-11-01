@@ -5,7 +5,7 @@ return function(directories_with_files)
   local finders = require "telescope.finders"
   local pickers = require "telescope.pickers"
   local sorters = require("telescope.sorters")
-  local write = require("nvim-monorepos.write")
+  local write = require("nvim-monorepos.write").writeOutput
 
   local utils = require("nvim-monorepos.utils")
   local get_last_part_of_directory = utils.get_last_part_of_directory
