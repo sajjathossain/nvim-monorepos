@@ -49,7 +49,7 @@ local function findRootDirectoriesWithFiles(patterns)
       if entry ~= '.' and entry ~= '..' then
         local file_path = directory .. '/' .. entry
         if vim.fn.isdirectory(file_path) == 0 then
-          for _, pattern in file_patterns do
+          for _, pattern in ipairs(file_patterns) do
             if string.match(entry, pattern) then
               return true
             end
