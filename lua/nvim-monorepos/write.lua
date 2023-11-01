@@ -20,8 +20,13 @@ local writeOutput = function(output_file, value)
   local file = io.open(output_file, "w")
 
   if file then
-    file:write(value) -- Write each absolute path to a new line
-    file:close()      -- Close the file
+    if (type(value) == "table") then
+      file:write(table.concat(value, "")) -- Write each absolute path to a new line
+    elseif (type(value) == "string") then
+      file:write(table.concat(value, "")) -- Write each absolute path to a new line
+    end
+
+    file:close() -- Close the file
     print("Results have been written to " .. output_file)
   else
     print("Failed to open the output file for writing.")
