@@ -1,6 +1,7 @@
 local setRootDirectory = require("nvim-monorepos.root")
 local findDirectories = require("nvim-monorepos.find-directories")
 local write = require("nvim-monorepos.write")
+local telescope = require("nvim-monorepos.telescope")
 
 --[[
   setup function
@@ -29,7 +30,8 @@ local setup = function(options)
 
   local root_directories_with_files = findDirectories(patterns)
 
-  write(output_file, root_directories_with_files)
+  telescope(root_directories_with_files)
+  -- write(output_file, root_directories_with_files)
 
   setRootDirectory()
 end
