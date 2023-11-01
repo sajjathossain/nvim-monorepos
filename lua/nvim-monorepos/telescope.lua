@@ -1,16 +1,10 @@
 -- shows the outupt in telescope
 return function(directories_with_files)
+  local actions = require "telescope.actions"
+  local action_state = require "telescope.actions.state"
   local finders = require "telescope.finders"
   local pickers = require "telescope.pickers"
   local sorters = require("telescope.sorters")
-  local write = require("nvim-monorepos.write")
-  local entry_marker = function(entry)
-    return {
-      value = entry[1],
-      display = entry[1],
-      ordinal = entry[1],
-    }
-  end
 
   local utils = require("nvim-monorepos.utils")
   local get_last_part_of_directory = utils.get_last_part_of_directory
@@ -20,6 +14,16 @@ return function(directories_with_files)
   for _, value in ipairs(directories_with_files) do
     local key = get_last_part_of_directory(value)
     table.insert(M, { key, value })
+  end
+
+  local enter = function(prompt_bufnr)
+    local selected = action_state.get_selected_entry()
+    print(vim.inspect(selected))
+  end
+
+  local attach_mappings = function(prompt_bufnr, map)
+    map("i", "<cr>", enter)
+    return true
   end
 
 
@@ -34,11 +38,11 @@ return function(directories_with_files)
           ordinal = entry[2],
         }
 
-        write("output.txt", maker)
         return maker
       end
     },
     sorter = sorters.get_generic_fuzzy_sorter({}),
     previewer = false,
+    attach_mappings = attach_mappings
   }):find()
 end
