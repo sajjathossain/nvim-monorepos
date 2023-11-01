@@ -17,7 +17,7 @@ local setup = function(options)
 
   -- Usage example
   local patterns = {
-    file = { "%.md" }, -- Replace with your file patterns
+    file = { "%.md", "package.json" }, -- Replace with your file patterns
   }
 
   if filePatterns and #filePatterns > 0 then
