@@ -3,6 +3,7 @@ return function(directories_with_files)
   local finders = require "telescope.finders"
   local pickers = require "telescope.pickers"
   local sorters = require("telescope.sorters")
+  local write = require("nvim-monorepos.write")
   local entry_marker = function(entry)
     return {
       value = entry[1],
@@ -27,11 +28,14 @@ return function(directories_with_files)
     finder = finders.new_table {
       results = M,
       entry_maker = function(entry)
-        return {
+        local maker = {
           value = entry,
           display = entry[1],
           ordinal = entry[1],
         }
+
+        write("output.txt", maker)
+        return maker
       end
     },
     sorter = sorters.get_generic_fuzzy_sorter({}),
