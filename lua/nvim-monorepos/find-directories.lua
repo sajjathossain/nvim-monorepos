@@ -145,16 +145,16 @@ end
 ------------------------------------------------------------------------
 
 
-local function findSubdirectoriesWithRootFile(root_files, ignore_patterns)
+local function findSubdirectoriesWithRootFile(root_files, search_dir_regex, ignore_patterns)
   local current_directory = vim.fn.getcwd()
   local subdirectories = {}
 
   -- Check if the current directory contains a file in the root directory matching any of the specified regex patterns
-  local function hasRootFile(directory, rf)
+  local function hasRootFile(dir, rf)
     for _, pattern in ipairs(rf) do
       local regex_pattern = "^" .. pattern .. "$"
-      for _, entry in ipairs(vim.fn.readdir(directory)) do
-        local entry_path = directory .. '/' .. entry
+      for _, entry in ipairs(vim.fn.readdir(dir)) do
+        local entry_path = dir .. '/' .. entry
         if vim.fn.isdirectory(entry_path) == 0 and string.match(entry, regex_pattern) then
           return true
         end
@@ -163,11 +163,17 @@ local function findSubdirectoriesWithRootFile(root_files, ignore_patterns)
     return false
   end
 
+  -- Check if the current directory is part of a Git repository
+  local function isGitDirectory(dir)
+    local git_directory = dir .. '/.git'
+    return vim.fn.isdirectory(git_directory) == 1
+  end
+
   -- Check if the current directory matches any of the ignore patterns
-  local function matchesIgnorePattern(directory, igp)
+  local function matchesIgnorePattern(dir, igp)
     for _, pattern in ipairs(igp) do
       local regex_pattern = "^" .. pattern .. "$"
-      if string.match(directory, regex_pattern) then
+      if string.match(dir, regex_pattern) then
         return true
       end
     end
@@ -175,20 +181,35 @@ local function findSubdirectoriesWithRootFile(root_files, ignore_patterns)
   end
 
   -- Recursively search for subdirectories with a file in the root directory matching regex
-  local function searchDirectories(directory)
-    if hasRootFile(directory, root_files) and not matchesIgnorePattern(directory, ignore_patterns) then
-      table.insert(subdirectories, directory)
+  local function searchDirectories(dir)
+    if hasRootFile(dir, root_files) and not isGitDirectory(dir) and not matchesIgnorePattern(dir, ignore_patterns) then
+      table.insert(subdirectories, dir)
     end
 
-    for _, subdirectory in ipairs(vim.fn.readdir(directory)) do
-      local subdirectory_path = directory .. '/' .. subdirectory
+    for _, subdirectory in ipairs(vim.fn.readdir(dir)) do
+      local subdirectory_path = dir .. '/' .. subdirectory
       if vim.fn.isdirectory(subdirectory_path) == 1 then
         searchDirectories(subdirectory_path)
       end
     end
   end
 
-  searchDirectories(current_directory)
+  -- Perform the search within directories that match the specified regex patterns in the table
+  local performSearch = function(cwd)
+    for _, subdirectory in ipairs(vim.fn.readdir(cwd)) do
+      local subdirectory_path = cwd .. '/' .. subdirectory
+      if vim.fn.isdirectory(subdirectory_path) == 1 then
+        for _, pattern in ipairs(search_dir_regex) do
+          if string.match(subdirectory, pattern) then
+            searchDirectories(subdirectory_path)
+            break
+          end
+        end
+      end
+    end
+  end
+
+  performSearch(current_directory)
 
   return subdirectories
 end
