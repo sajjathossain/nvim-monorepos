@@ -63,7 +63,8 @@ local function findRootDirectoriesWithFiles(patterns)
   -- Check if the current directory matches the directory pattern
   local function matchesDirectoryPattern(directory, dir_patterns)
     for _, pattern in ipairs(dir_patterns) do
-      if string.match(directory, pattern) then
+      local regex_pattern = "^" .. pattern .. "$"
+      if string.match(directory, regex_pattern) then
         return true
       end
     end
