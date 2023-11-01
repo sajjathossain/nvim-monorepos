@@ -1,5 +1,5 @@
 -- function to write the outputs
-return function(output_file, root_directories_with_files)
+local write = function(output_file, root_directories_with_files)
   -- Open the output file for writing
   local file = io.open(output_file, "w")
 
@@ -14,3 +14,21 @@ return function(output_file, root_directories_with_files)
     print("Failed to open the output file for writing.")
   end
 end
+
+local writeOutput = function(output_file, value)
+  -- Open the output file for writing
+  local file = io.open(output_file, "w")
+
+  if file then
+    file:write(value) -- Write each absolute path to a new line
+    file:close()      -- Close the file
+    print("Results have been written to " .. output_file)
+  else
+    print("Failed to open the output file for writing.")
+  end
+end
+
+return {
+  write = write,
+  writeOutput = writeOutput
+}
