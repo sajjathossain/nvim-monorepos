@@ -23,9 +23,9 @@ return function(directories_with_files)
   local enter = function(prompt_bufnr)
     local selected = action_state.get_selected_entry()
     local cwd = entries[selected]
+    actions.close(prompt_bufnr)
     vim.fn.chdir(cwd)
     builtin.find_files({ cwd = cwd })
-    actions.close(prompt_bufnr)
   end
 
   local attach_mappings = function(prompt_bufnr, map)
