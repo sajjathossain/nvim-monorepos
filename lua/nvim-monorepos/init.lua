@@ -17,9 +17,9 @@ local setup = function(options)
 
   -- Usage example
   local patterns = {
-    file = { "*.md", "package.json" }, -- Replace with your file patterns
-    ignore = { ".git/**", "node_modules/**" },
-    dir = { "./apps/**/*", "./packages/**/*" }
+    file = { "README.*", "package.json" }, -- Replace with your file patterns
+    ignore = { "git.*", "node_modules.*" },
+    dir = { "apps.*", "packages.*" }
   }
 
   if filePatterns and #filePatterns > 0 then
