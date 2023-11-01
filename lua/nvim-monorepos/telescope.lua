@@ -19,7 +19,7 @@ return function(directories_with_files)
 
   for _, value in ipairs(directories_with_files) do
     local key = get_last_part_of_directory(value)
-    table.insert(M, key)
+    table.insert(M, { key, value })
   end
 
 
@@ -34,7 +34,7 @@ return function(directories_with_files)
           ordinal = entry[1],
         }
 
-        write("output.txt", { entry })
+        write("output.txt", entry)
         return maker
       end
     },
