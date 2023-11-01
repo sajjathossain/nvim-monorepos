@@ -18,7 +18,6 @@ local setup = function(options)
   -- Usage example
   local patterns = {
     file = { "%.md", "package.json" }, -- Replace with your file patterns
-    dir = { "**/apps/**/*", "**/packages/**/*" },
     ignore = { ".git/**" }
   }
 
@@ -26,7 +25,7 @@ local setup = function(options)
     patterns.file = filePatterns
   end
 
-  root_directories_with_files = findDirectories(patterns, patterns.ignore)
+  root_directories_with_files = findDirectories(patterns.file, patterns.ignore)
 
   setRootDirectory()
 end
