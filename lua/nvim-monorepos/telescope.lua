@@ -31,10 +31,10 @@ return function(directories_with_files)
         local maker = {
           value = entry,
           display = entry[1],
-          ordinal = entry[1],
+          ordinal = entry[2],
         }
 
-        write("output.txt", entry)
+        write("output.txt", maker)
         return maker
       end
     },
