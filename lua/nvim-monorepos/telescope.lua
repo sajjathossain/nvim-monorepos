@@ -26,7 +26,6 @@ return function(directories_with_files)
     prompt_title = "Projects",
     finder = finders.new_table {
       results = M,
-      entry_marker = entry_marker
     },
     sorter = sorters.get_generic_fuzzy_sorter({}),
     previewer = false,
