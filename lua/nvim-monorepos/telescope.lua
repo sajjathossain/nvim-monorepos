@@ -34,7 +34,7 @@ return function(directories_with_files)
           ordinal = entry[1],
         }
 
-        write("output.txt", maker)
+        write("output.txt", entry)
         return maker
       end
     },
