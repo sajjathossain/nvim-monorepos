@@ -26,11 +26,12 @@ return function(directories_with_files)
 
     -- vim.fn.chdir(cwd)
     actions.close(prompt_bufnr)
-    builtin.find_files({ cwd = cwd })
+    builtin.find_files({ prompt_title = "Files in " .. cwd, cwd = cwd })
   end
 
   local attach_mappings = function(prompt_bufnr, map)
     map("i", "<CR>", enter)
+    map("n", "<CR>", enter)
     return true
   end
 
