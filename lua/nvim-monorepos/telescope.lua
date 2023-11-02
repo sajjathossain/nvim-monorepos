@@ -1,5 +1,5 @@
 -- shows the outupt in telescope
-return function(directories_with_files, rootPatterns)
+return function(directories_with_files)
   local actions = require "telescope.actions"
   local action_state = require "telescope.actions.state"
   local finders = require "telescope.finders"
@@ -9,22 +9,23 @@ return function(directories_with_files, rootPatterns)
 
   local utils = require("nvim-monorepos.utils")
   local get_last_part_of_directory = utils.get_last_part_of_directory
-  local getLastTwoPortions = utils.getLastTwoPortions
 
-  local M = {}
   local entries = {}
+  local M = {}
 
-  for _, value in ipairs(directories_with_files) do
-    local key = getLastTwoPortions(value, rootPatterns)
+  for _, value in pairs(directories_with_files) do
+    local key = get_last_part_of_directory(value)
     table.insert(M, key)
-    table.insert(entries, { key = value })
+    entries[key] = value
   end
 
   local enter = function(prompt_bufnr)
-    local selected = action_state.get_selected_entry()
+    local selected = action_state.get_selected_entry().value
     local cwd = entries[selected]
+
+
+    -- vim.fn.chdir(cwd)
     actions.close(prompt_bufnr)
-    vim.fn.chdir(cwd)
     builtin.find_files({ cwd = cwd })
   end
 
@@ -34,7 +35,9 @@ return function(directories_with_files, rootPatterns)
   end
 
 
-  pickers.new({}, {
+  pickers.new({
+    sorting_strategy = 'ascending'
+  }, {
     prompt_title = "Projects",
     finder = finders.new_table {
       results = M,
