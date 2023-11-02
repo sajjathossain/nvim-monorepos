@@ -30,11 +30,11 @@ local setup = function(options)
   root_directories_with_files = subdirs
 end
 
-local show_list = function()
+local show_projects = function()
   telescope(root_directories_with_files)
 end
 
 return {
   setup = setup,
-  show_list = show_list
+  show_projects = show_projects
 }
