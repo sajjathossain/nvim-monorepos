@@ -1,3 +1,4 @@
+--- get the last part of the directory string
 local get_last_part_of_directory = function(directoryPath)
   -- Extract the last part of the directory path
   local lastPart = vim.fn.fnamemodify(directoryPath, ':t')
