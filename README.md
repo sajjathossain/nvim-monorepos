@@ -7,15 +7,25 @@ this is a simple project picker. it finds all the projects matching a specific p
 ```lua
 {
   "sajjathossain/nvim-monorepos",
-  event = {"VeryLazy", "BufWinEnter"},
-  config = true,
+  dependencies = {
+    "nvim-telescope/telescope.nvim"
+  },
+  cmd = {
+    "ShowAllProjectsInThisMonorepo"
+  },
+  config = true
 }
 ```
 or
 ```lua
 {
   "sajjathossain/nvim-monorepos",
-  event = {"VeryLazy", "BufWinEnter"},
+  dependencies = {
+    "nvim-telescope/telescope.nvim"
+  },
+  cmd = {
+    "ShowAllProjectsInThisMonorepo"
+  },
   config = function()
     require("nvim-monorepos").setup()
   end
@@ -26,4 +36,10 @@ or
 - show projects
 ```lua
 require("nvim-monorepos").show_projects()
+```
+
+### available commands
+- show projects
+```lua
+ShowProjectsInThisMonorepo
 ```
