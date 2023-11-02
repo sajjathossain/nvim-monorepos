@@ -1,70 +1,98 @@
-local get_last_part_of_directory = function(path)
-  -- Split the path into parts based on the directory separator ("/" or "\")
-  local parts = {}
-  for part in path:gmatch("[^/\\]+") do
-    table.insert(parts, part)
-  end
-
-  -- Get the last part of the path
-  local last_part = parts[#parts]
-
-  return last_part
+local get_last_part_of_directory = function(directoryPath)
+  -- Extract the last part of the directory path
+  local lastPart = vim.fn.fnamemodify(directoryPath, ':t')
+  return lastPart
 end
 
---- get last two protions from a directory pattern
-local function getLastTwoPortions(path, rootPatterns)
-  local parts = {}
-  for part in path:gmatch("[^/]+") do
-    table.insert(parts, part)
-  end
-
-  for _, rootDir in ipairs(rootPatterns) do
-    if string.find(path, "/" .. rootDir .. "/") then
-      return table.concat({ "root/", path }, "/")
-    else
-      return table.concat({ parts[#parts - 1], parts[#parts] }, "/")
+-- filter directory
+local function filterDirectory(path, ignorePatterns)
+  local shouldKeep = true
+  for _, pattern in ipairs(ignorePatterns) do
+    if string.match(path, pattern) then
+      shouldKeep = false
+      break
     end
   end
-  return path
+
+  return shouldKeep
 end
-
--- Function to get a list of subdirectories, excluding ignored ones
-local function get_subdirectories(path, ignore_dirs, required_files)
-  local subdirs = {}
-  local output = vim.fn.systemlist('find ' .. path .. ' -type d')
-
-  for _, dir in ipairs(output) do
-    -- Check if the directory is in the ignore list
-    local is_ignored = false
-    for _, ignore_dir in ipairs(ignore_dirs) do
-      if string.match(dir, ignore_dir) then
-        is_ignored = true
+-- filter directories that matches the ignore pattern
+local function filterDirectories(directories, ignorePatterns)
+  local filteredDirectories = {}
+  for _, dir in ipairs(directories) do
+    local shouldKeep = true
+    for _, pattern in ipairs(ignorePatterns) do
+      if string.match(dir, pattern) then
+        shouldKeep = false
         break
       end
     end
+    if shouldKeep then
+      table.insert(filteredDirectories, dir)
+    end
+  end
+  return filteredDirectories
+end
 
-    if not is_ignored then
-      -- Check if the directory contains at least one required file
-      local contains_required_file = false
-      for _, file in ipairs(required_files) do
-        local full_path = dir .. '/' .. file
-        if vim.fn.filereadable(full_path) == 1 then
-          contains_required_file = true
+
+-- Function to filter directories
+local function filterDirectoriesWithPatterns(directories, filePatterns)
+  local filteredDirectories = {}
+
+  for _, directory in ipairs(directories) do
+    local shouldKeep = false
+
+    for _, pattern in ipairs(filePatterns) do
+      local files = vim.fn.readdir(directory)
+      local matchesPattern = false
+
+      for _, file in ipairs(files) do
+        if vim.fn.glob(pattern, file) == file then
+          matchesPattern = true
           break
         end
       end
 
-      if contains_required_file then
-        table.insert(subdirs, dir)
+      if matchesPattern then
+        shouldKeep = true
+        break
+      end
+    end
+
+    if shouldKeep then
+      table.insert(filteredDirectories, directory)
+    end
+  end
+
+  return filteredDirectories
+end
+
+local function find_subdirectories(root_directory, ignorePatterns)
+  local subdirectories = {}
+
+  local function find_subdirectories_recursive(directory)
+    local items = vim.fn.readdir(directory)
+
+    for _, item in ipairs(items) do
+      if filterDirectory(directory, ignorePatterns) then
+        local path = directory .. '/' .. item
+        local is_directory = vim.fn.isdirectory(path)
+        if is_directory == 1 and item ~= '.' and item ~= '..' then
+          table.insert(subdirectories, path)
+          find_subdirectories_recursive(path)
+        end
       end
     end
   end
 
-  return subdirs
+  find_subdirectories_recursive(root_directory)
+
+  return subdirectories
 end
 
 return {
   get_last_part_of_directory = get_last_part_of_directory,
-  get_subdirectories = get_subdirectories,
-  getLastTwoPortions = getLastTwoPortions
+  find_subdirectories = find_subdirectories,
+  filterDirectories = filterDirectories,
+  filterDirectoriesWithPatterns = filterDirectoriesWithPatterns
 }
