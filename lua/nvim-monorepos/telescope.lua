@@ -6,6 +6,7 @@ return function(directories_with_files)
   local pickers = require "telescope.pickers"
   local builtin = require("telescope.builtin")
   local sorters = require("telescope.sorters")
+  local themes = require("telescope.themes")
 
   local utils = require("nvim-monorepos.utils")
   local get_last_part_of_directory = utils.get_last_part_of_directory
@@ -26,7 +27,7 @@ return function(directories_with_files)
 
     -- vim.fn.chdir(cwd)
     actions.close(prompt_bufnr)
-    builtin.find_files({ prompt_title = "Files in " .. cwd, cwd = cwd })
+    builtin.find_files({ prompt_title = "Find files in " .. cwd, cwd = cwd })
   end
 
   local attach_mappings = function(prompt_bufnr, map)
@@ -36,14 +37,10 @@ return function(directories_with_files)
   end
 
 
-  pickers.new({
-    sorting_strategy = 'ascending'
-  }, {
+  pickers.new(themes.get_dropdown(), {
     prompt_title = "Projects",
-    finder = finders.new_table {
-      results = M,
-    },
-    sorter = sorters.get_generic_fuzzy_sorter({}),
+    finder = finders.new_table(M),
+    sorter = sorters.get_fuzzy_file(),
     previewer = false,
     attach_mappings = attach_mappings
   }):find()
