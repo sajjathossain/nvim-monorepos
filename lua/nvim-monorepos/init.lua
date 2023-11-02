@@ -14,21 +14,32 @@ local setup = function(options)
   options = options or {
     patterns = {}
   }
-  local filePatterns = options.patterns
+
+  local files = options.files
+  local ignore = options.ignore
+  local root = options.root
 
 
   local patterns = {
-    file = { "project.json", "package.json", "README.*" }, -- Replace with your file patterns
+    files = { "project.json", "package.json" }, -- Replace with your file patterns
     ignore = { ".git", "node_modules", "build" },
+    root = {}
   }
 
-  if filePatterns and #filePatterns > 0 then
-    patterns.file = filePatterns
+  if files and #files > 0 then
+    patterns["files"] = files
   end
 
+  if ignore and #ignore > 0 then
+    patterns["ignore"] = ignore
+  end
+
+  if root and #root > 0 then
+    patterns["root"] = root
+  end
 
   local dirs = utils.find_subdirectories(initial_directory, patterns.ignore)
-  local subdirs = utils.filterDirectoriesWithPatterns(dirs, patterns.file)
+  local subdirs = utils.filterDirectoriesWithPatterns(dirs, patterns.files)
   root_directories_with_files = subdirs
   customcmds.init(root_directories_with_files)
 end
