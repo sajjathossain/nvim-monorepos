@@ -15,6 +15,7 @@ local write = function(output_file, root_directories_with_files)
   end
 end
 
+-- function to write output the outputs
 local writeOutput = function(output_file, value)
   -- Open the output file for writing
   local file = io.open(output_file, "w")
