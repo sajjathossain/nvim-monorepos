@@ -1,5 +1,6 @@
 local utils = require("nvim-monorepos.utils")
-local telescope = require("nvim-monorepos.telescope")
+local methods = require("nvim-monorepos.methods")
+local customcmds = require("nvim-monorepos.custom-commands")
 
 local initial_directory = nil
 local root_directories_with_files = {}
@@ -25,16 +26,14 @@ local setup = function(options)
     patterns.file = filePatterns
   end
 
+
   local dirs = utils.find_subdirectories(initial_directory, patterns.ignore)
   local subdirs = utils.filterDirectoriesWithPatterns(dirs, patterns.file)
   root_directories_with_files = subdirs
-end
-
-local show_projects = function()
-  telescope(root_directories_with_files)
+  customcmds.init(root_directories_with_files)
 end
 
 return {
   setup = setup,
-  show_projects = show_projects
+  show_projects = methods.show_projects(root_directories_with_files)
 }
