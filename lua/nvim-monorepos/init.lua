@@ -1,17 +1,15 @@
-local setRootDirectory = require("nvim-monorepos.root")
 local utils = require("nvim-monorepos.utils")
-local write = require("nvim-monorepos.write").writeOutput
 local telescope = require("nvim-monorepos.telescope")
 
-local get_subdirectories = utils.get_subdirectories
-local root_directories_with_files = nil
-local root = { ".git" }
+local initial_directory = nil
+local root_directories_with_files = {}
 
 --[[
   setup function
   @param options (table) [optional] file name
 -- ]]
 local setup = function(options)
+  initial_directory = vim.fn.getcwd()
   options = options or {
     patterns = {}
   }
@@ -19,22 +17,21 @@ local setup = function(options)
 
 
   local patterns = {
-    file = { "project.json", "package.json", "README.md" }, -- Replace with your file patterns
-    ignore = { ".git", "node_modules", "**/build" },
+    file = { "project.json", "package.json", "README.*" }, -- Replace with your file patterns
+    ignore = { ".git", "node_modules", "build" },
   }
 
   if filePatterns and #filePatterns > 0 then
     patterns.file = filePatterns
   end
 
-  setRootDirectory()
-
-  local subdirs = get_subdirectories(vim.fn.getcwd(), patterns.ignore, patterns.file)
+  local dirs = utils.find_subdirectories(initial_directory, patterns.ignore)
+  local subdirs = utils.filterDirectoriesWithPatterns(dirs, patterns.file)
   root_directories_with_files = subdirs
 end
 
 local show_list = function()
-  telescope(root_directories_with_files, root)
+  telescope(root_directories_with_files)
 end
 
 return {
