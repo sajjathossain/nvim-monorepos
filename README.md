@@ -13,7 +13,8 @@ this is a simple project picker. it finds all the projects matching a specific p
     "nvim-telescope/telescope.nvim"
   },
   cmd = {
-    "ShowAllProjectsInThisMonorepo"
+    "FindFilesInAProject",
+    "FindInFilesInAProject"
   },
   config = true
 }
@@ -28,7 +29,8 @@ or
     "nvim-telescope/telescope.nvim"
   },
   cmd = {
-    "ShowAllProjectsInThisMonorepo"
+    "FindFilesInAProject",
+    "FindInFilesInAProject"
   },
   config = function()
     require("nvim-monorepos").setup()
@@ -38,18 +40,30 @@ or
 
 ### available methods
 
-- show projects
+- find files
 
 ```lua
-require("nvim-monorepos").show_projects()
+require("nvim-monorepos").find_files()
+```
+
+- find in files
+
+```lua
+require("nvim-monorepos").find_in_files()
 ```
 
 ### available commands
 
-- show projects
+- find files in project
 
 ```lua
-ShowProjectsInThisMonorepo
+FindFilesInAProject
+```
+
+- find in files in project
+
+```lua
+FindInFilesInAProject
 ```
 
 ### Default config
