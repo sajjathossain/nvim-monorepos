@@ -1,4 +1,4 @@
---- shows the outupt in telescope
+--- Shows the output in telescope
 --- @param params {directories_with_files: table, action?: "find-files" | "find-in-files"}
 return function(params)
   local directories_with_files = params.directories_with_files
@@ -19,20 +19,20 @@ return function(params)
   local get_last_part_of_directory = utils.get_last_part_of_directory
 
   local entries = {}
-  local M = {}
+  local display_items = {}
 
-  for _, value in ipairs(directories_with_files) do
-    local key = get_last_part_of_directory(value)
-    table.insert(M, key)
-    entries[key] = value
+  if #directories_with_files > 0 then
+    for _, value in ipairs(directories_with_files) do
+      local key = get_last_part_of_directory(value)
+      table.insert(display_items, key)
+      entries[key] = value
+    end
   end
 
   local enter = function(prompt_bufnr)
-    local selected = action_state.get_selected_entry().value or ""
-    local cwd = entries[selected] or ""
+    local selected = action_state.get_selected_entry().value
+    local cwd = entries[selected]
 
-
-    -- vim.fn.chdir(cwd)
     actions.close(prompt_bufnr)
 
     if action == "find-files" then
@@ -48,13 +48,33 @@ return function(params)
     return true
   end
 
-
-  pickers.new(themes.get_dropdown(), {
+  pickers.new(themes.get_dropdown({
     prompt_title = "Projects",
-    finder = finders.new_table(M),
+    prompt_prefix = "🔍 ",
+    results_title = "Select a Project",
+    preview_title = "Project Preview",
+    layout_config = {
+      horizontal = {
+        preview_width = 0.5,
+      },
+    },
+    initial_mode = "insert",
+    default_text = nil,
+    border = true,
+    winblend = 10,
+    attach_mappings = attach_mappings,
+  }), {
+    finder = finders.new_table {
+      results = display_items,
+      entry_maker = function(entry)
+        return {
+          value = entry,
+          display = entry,
+          ordinal = entry
+        }
+      end
+    },
     sorter = sorters.get_fuzzy_file(),
-    selection_strategy = "reset",
     previewer = false,
-    attach_mappings = attach_mappings
   }):find()
 end
