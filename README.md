@@ -1,6 +1,6 @@
 <h1>Nvim Monorepos</h1>
 
-this is a simple project picker. it finds all the projects matching a specific pattern of files in your sub directories and lists them using **telescope.nvim**. when select any of the project, it will show all the files of that project. this makes it easier to find files when you're working with a mono repo
+this is a simple file picker. it finds all the files matching a specific pattern of files in your sub directories and lists them using **telescope.nvim**. when selected any of the files, it will open the file in the current buffer.
 
 ### Install
 
