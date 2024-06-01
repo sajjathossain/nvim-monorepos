@@ -18,10 +18,10 @@ local findInFilesInAProject = function()
   methods.find_in_files(initial_directory)
 end
 
-create_user_command("FindFilesInAProject", findFilesInAProject, {})
-create_user_command("FindInFilesInAProject", findInFilesInAProject, {})
-
 M.init = function(dir)
+  create_user_command("FindFilesInAProject", findFilesInAProject, { nargs = 0 })
+  create_user_command("FindInFilesInAProject", findInFilesInAProject, { nargs = 0 })
+
   initial_directory = dir
 end
 
