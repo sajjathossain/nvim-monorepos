@@ -1,12 +1,14 @@
+local M = {}
 --- get the last part of the directory string
-local get_last_part_of_directory = function(directoryPath)
+--- @param directoryPath (string) path of the directory
+M.get_last_part_of_directory = function(directoryPath)
   -- Extract the last part of the directory path
   local lastPart = vim.fn.fnamemodify(directoryPath, ':t')
-  return lastPart
+  return lastPart or ""
 end
 
 -- filter directory
-local function filterDirectory(path, ignorePatterns)
+local filterDirectory = function(path, ignorePatterns)
   local shouldKeep = true
   for _, pattern in ipairs(ignorePatterns) do
     if string.match(path, pattern) then
@@ -18,7 +20,7 @@ local function filterDirectory(path, ignorePatterns)
   return shouldKeep
 end
 -- filter directories that matches the ignore pattern
-local function filterDirectories(directories, ignorePatterns)
+M.filterDirectories = function(directories, ignorePatterns)
   local filteredDirectories = {}
   for _, dir in ipairs(directories) do
     local shouldKeep = true
@@ -37,7 +39,7 @@ end
 
 
 -- Function to filter directories
-local function filterDirectoriesWithPatterns(directories, filePatterns)
+M.filterDirectoriesWithPatterns = function(directories, filePatterns)
   local filteredDirectories = {}
 
   for _, directory in ipairs(directories) do
@@ -68,7 +70,7 @@ local function filterDirectoriesWithPatterns(directories, filePatterns)
   return filteredDirectories
 end
 
-local function find_subdirectories(root_directory, ignorePatterns)
+M.find_subdirectories = function(root_directory, ignorePatterns)
   local subdirectories = {}
 
   local function find_subdirectories_recursive(directory)
@@ -91,9 +93,4 @@ local function find_subdirectories(root_directory, ignorePatterns)
   return subdirectories
 end
 
-return {
-  get_last_part_of_directory = get_last_part_of_directory,
-  find_subdirectories = find_subdirectories,
-  filterDirectories = filterDirectories,
-  filterDirectoriesWithPatterns = filterDirectoriesWithPatterns
-}
+return M
