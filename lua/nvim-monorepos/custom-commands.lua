@@ -4,21 +4,25 @@
 ---------------------------------------------------------------------
 
 -- NOTE: EXAMPLE
+local M = {}
 local methods = require("nvim-monorepos.methods")
 local create_user_command = vim.api.nvim_create_user_command
 
 local initial_directory = nil
 
-local showAllProjectsInThisMonorepo = function()
-  methods.show_projects(initial_directory)
+local findFilesInAProject = function()
+  methods.find_files(initial_directory)
 end
 
-create_user_command("ShowAllProjectsInThisMonorepo", showAllProjectsInThisMonorepo, {})
+local findInFilesInAProject = function()
+  methods.find_in_files(initial_directory)
+end
 
-local init = function(dir)
+create_user_command("FindFilesInAProject", findFilesInAProject, {})
+create_user_command("FindInFilesInAProject", findInFilesInAProject, {})
+
+M.init = function(dir)
   initial_directory = dir
 end
 
-return {
-  init = init
-}
+return M
