@@ -1,15 +1,18 @@
-local utils = require("nvim-monorepos.utils")
-local methods = require("nvim-monorepos.methods")
-local customcmds = require("nvim-monorepos.custom-commands")
+local status_ok, utils = pcall(require, "nvim-monorepos.utils")
+local status_ok_method, methods = pcall(require, "nvim-monorepos.methods")
+local status_ok_customcmds, customcmds = pcall(require, "nvim-monorepos.custom-commands")
+
+if not status_ok or not status_ok_method or not status_ok_customcmds then return end
 
 local initial_directory = nil
 local root_directories_with_files = {}
+local M = {}
 
---[[
-  setup function
-  @param options (table) [optional] file name
--- ]]
-local setup = function(options)
+M.find_files = methods.find_files(root_directories_with_files)
+M.find_in_files = methods.find_in_files(root_directories_with_files)
+
+--- @param options (table)? [optional] file name
+M.setup = function(options)
   initial_directory = vim.fn.getcwd()
   options = options or {
     patterns = {}
@@ -40,11 +43,9 @@ local setup = function(options)
 
   local dirs = utils.find_subdirectories(initial_directory, patterns.ignore)
   local subdirs = utils.filterDirectoriesWithPatterns(dirs, patterns.files)
+
   root_directories_with_files = subdirs
   customcmds.init(root_directories_with_files)
 end
 
-return {
-  setup = setup,
-  show_projects = methods.show_projects(root_directories_with_files)
-}
+return M

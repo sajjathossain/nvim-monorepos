@@ -1,9 +1,14 @@
-local telescope = require("nvim-monorepos.telescope")
+local M = {}
+local status_ok_telescope, telescope = pcall(require, "nvim-monorepos.telescope")
 
-local show_projects = function(directories)
-  telescope(directories)
+if not status_ok_telescope then return end
+
+M.find_files = function(directories)
+  telescope({ directories_with_files = directories, action = "find-files" })
 end
 
-return {
-  show_projects = show_projects
-}
+M.find_in_files = function(directories)
+  telescope({ directories_with_files = directories, action = "find-in-files" })
+end
+
+return M
