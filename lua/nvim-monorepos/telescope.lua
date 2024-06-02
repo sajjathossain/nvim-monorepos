@@ -64,6 +64,7 @@ return function(params)
     winblend = 10,
     attach_mappings = attach_mappings,
   }), {
+    default_text = nil,
     finder = finders.new_table {
       results = display_items,
       entry_maker = function(entry)
