@@ -1,5 +1,6 @@
+local M = {}
 -- function to write the outputs
-local write = function(output_file, root_directories_with_files)
+M.write = function(output_file, root_directories_with_files)
   -- Open the output file for writing
   local file = io.open(output_file, "w")
 
@@ -16,7 +17,7 @@ local write = function(output_file, root_directories_with_files)
 end
 
 -- function to write output the outputs
-local writeOutput = function(output_file, value)
+M.writeOutput = function(output_file, value)
   -- Open the output file for writing
   local file = io.open(output_file, "w")
 
@@ -34,7 +35,4 @@ local writeOutput = function(output_file, value)
   end
 end
 
-return {
-  write = write,
-  writeOutput = writeOutput
-}
+return M
