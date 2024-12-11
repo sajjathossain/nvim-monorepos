@@ -1,20 +1,24 @@
+local status_ok, telescope = pcall(require, "telescope")
+if not status_ok then return end
+
+telescope.setup {}
+local actions = require("telescope.actions")
+local action_state = require("telescope.actions.state")
+local finders = require("telescope.finders")
+local pickers = require("telescope.pickers")
+local builtin = require("telescope.builtin")
+local sorters = require("telescope.sorters")
+local themes = require("telescope.themes")
+local utils = require("nvim-monorepos.utils")
+
 --- Shows the output in telescope
 --- @param params {directories_with_files: table, action?: "find-files" | "find-in-files"}
 return function(params)
   local directories_with_files = params.directories_with_files
+  if #directories_with_files == 0 or directories_with_files == nil then return end
+
   local action = params.action
   action = action or "find-files"
-
-  local status_ok_actions, actions = pcall(require, "telescope.actions")
-  local status_ok_action_state, action_state = pcall(require, "telescope.actions.state")
-  local status_ok_finders, finders = pcall(require, "telescope.finders")
-  local status_ok_pickers, pickers = pcall(require, "telescope.pickers")
-  local status_ok_builtin, builtin = pcall(require, "telescope.builtin")
-  local status_ok_sorters, sorters = pcall(require, "telescope.sorters")
-  local status_ok_themes, themes = pcall(require, "telescope.themes")
-  local status_ok_utils, utils = pcall(require, "nvim-monorepos.utils")
-
-  if not status_ok_actions or not status_ok_action_state or not status_ok_finders or not status_ok_pickers or not status_ok_builtin or not status_ok_sorters or not status_ok_themes or not status_ok_utils then return end
 
   local get_last_part_of_directory = utils.get_last_part_of_directory
 
@@ -48,34 +52,25 @@ return function(params)
     return true
   end
 
-  pickers.new(themes.get_dropdown({
+  local finder = finders.new_table({
+    results = display_items,
+    entry_maker = function(entry)
+      return {
+        value = entry,
+        display = entry,
+        ordinal = entry,
+      }
+    end
+  })
+
+  -- vim.print(display_items)
+
+  pickers.new({}, themes.get_dropdown({
+    finder = finder,
     prompt_title = "Projects",
-    prompt_prefix = "🔍 ",
-    results_title = "Select a Project",
-    preview_title = "Project Preview",
-    layout_config = {
-      horizontal = {
-        preview_width = 0.5,
-      },
-    },
-    initial_mode = "insert",
-    default_text = nil,
-    border = true,
-    winblend = 10,
+    sorters = require("telescope.sorters").empty(),
+    debounce = 100,
+    sorter = sorters.get_fzy_sorter(),
     attach_mappings = attach_mappings,
-  }), {
-    default_text = nil,
-    finder = finders.new_table {
-      results = display_items,
-      entry_maker = function(entry)
-        return {
-          value = entry,
-          display = entry,
-          ordinal = entry
-        }
-      end
-    },
-    sorter = sorters.get_fuzzy_file(),
-    previewer = false,
-  }):find()
+  })):find()
 end
