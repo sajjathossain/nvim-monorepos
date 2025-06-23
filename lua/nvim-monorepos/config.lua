@@ -2,6 +2,7 @@
 ---@field files string[] File patterns to search for in project roots
 ---@field ignore string[] Directory patterns to ignore during search
 ---@field root string[] Root directory patterns (currently unused but reserved for future use)
+---@field display table Display configuration options
 
 local M = {}
 
@@ -9,7 +10,12 @@ local M = {}
 M.defaults = {
   files = { "project.json", "package.json" },
   ignore = { ".git", "node_modules", "build" },
-  root = {}
+  root = {},
+  display = {
+    show_icons = true,
+    show_file_count = false,
+    compact_paths = true
+  }
 }
 
 ---Merge user options with defaults
@@ -29,6 +35,11 @@ M.setup = function(user_opts)
   if type(config.ignore) ~= "table" then
     vim.notify("nvim-monorepos: 'ignore' must be a table", vim.log.levels.WARN)
     config.ignore = M.defaults.ignore
+  end
+  
+  -- Validate display options
+  if type(config.display) ~= "table" then
+    config.display = M.defaults.display
   end
   
   return config

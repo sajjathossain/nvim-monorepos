@@ -10,6 +10,8 @@ local M = {}
 
 ---@type string[]|nil
 local project_directories = nil
+---@type table|nil
+local plugin_config = nil
 
 ---Find files in a selected project directory
 M.find_files = function()
@@ -17,7 +19,7 @@ M.find_files = function()
     vim.notify("nvim-monorepos: No project directories found. Run setup first.", vim.log.levels.WARN)
     return
   end
-  picker.show_project_picker(project_directories, "find_files")
+  picker.show_project_picker(project_directories, "find_files", plugin_config)
 end
 
 ---Search text in files within a selected project directory
@@ -26,7 +28,7 @@ M.find_in_files = function()
     vim.notify("nvim-monorepos: No project directories found. Run setup first.", vim.log.levels.WARN)
     return
   end
-  picker.show_project_picker(project_directories, "find_in_files")
+  picker.show_project_picker(project_directories, "find_in_files", plugin_config)
 end
 
 ---Setup the plugin with user configuration
@@ -38,13 +40,13 @@ M.setup = function(user_opts)
   local root_directory = vim.fn.getcwd()
   
   -- Setup configuration with user options
-  local plugin_config = config.setup(user_opts)
+  plugin_config = config.setup(user_opts)
   
   -- Find all project directories based on configuration
   project_directories = scanner.find_project_directories(root_directory, plugin_config)
   
   -- Setup user commands
-  commands.setup_commands(project_directories)
+  commands.setup_commands(project_directories, plugin_config)
   
   -- Provide feedback about found projects
   if #project_directories == 0 then

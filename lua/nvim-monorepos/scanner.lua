@@ -84,6 +84,59 @@ M.get_directory_basename = function(directory_path)
   return vim.fn.fnamemodify(directory_path, ':t') or ""
 end
 
+---Create a display name showing parent context for better identification
+---@param directory_path string Full directory path
+---@param root_directory string Root directory being scanned
+---@return string display_name Formatted display name with parent context
+M.create_display_name = function(directory_path, root_directory)
+  local relative_path = vim.fn.fnamemodify(directory_path, ':~:.')
+  
+  -- Remove leading ./ if present
+  if vim.startswith(relative_path, './') then
+    relative_path = string.sub(relative_path, 3)
+  end
+  
+  -- If the path is too long, show parent/current format
+  local parts = vim.split(relative_path, '/')
+  if #parts > 3 then
+    -- Show first part ... parent/current for very deep paths
+    local first = parts[1]
+    local parent = parts[#parts - 1]
+    local current = parts[#parts]
+    return first .. "/.../" .. parent .. "/" .. current
+  elseif #parts > 2 then
+    -- Show parent/current for moderately deep paths
+    local parent = parts[#parts - 1]
+    local current = parts[#parts]
+    return parent .. "/" .. current
+  elseif #parts == 2 then
+    -- Show parent/current for two-level paths
+    return parts[1] .. "/" .. parts[2]
+  else
+    -- Show just the directory name for single level
+    return relative_path
+  end
+end
+
+---Get project files that exist in a directory
+---@param directory string Directory path to check
+---@param file_patterns string[] File patterns to look for
+---@return string[] found_files List of project files found
+M.get_project_files = function(directory, file_patterns)
+  local found_files = {}
+  local files = vim.fn.readdir(directory)
+  
+  for _, pattern in ipairs(file_patterns) do
+    for _, file in ipairs(files) do
+      if file == pattern then
+        table.insert(found_files, file)
+      end
+    end
+  end
+  
+  return found_files
+end
+
 ---Find all project directories based on configuration
 ---@param root_directory string Starting directory for search
 ---@param config table Configuration with files and ignore patterns

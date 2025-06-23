@@ -9,6 +9,7 @@ A simple and efficient file picker for monorepo projects. This plugin finds all 
 - 🔎 **Text Search**: Live grep functionality within project directories
 - ⚙️ **Configurable**: Customizable file patterns and ignore rules
 - 🚀 **Performance**: Efficient directory scanning with ignore patterns
+- 📋 **Smart Display**: Shows parent directory context and project file indicators for better identification
 
 ## Installation
 
@@ -77,7 +78,12 @@ monorepos.find_in_files()
 ```lua
 {
   files = { "project.json", "package.json" },
-  ignore = { ".git", "node_modules", "build" }
+  ignore = { ".git", "node_modules", "build" },
+  display = {
+    show_icons = true,        -- Show file type icons
+    show_file_count = false,  -- Show file count instead of file names
+    compact_paths = true      -- Use compact path display
+  }
 }
 ```
 
@@ -87,6 +93,9 @@ monorepos.find_in_files()
 |--------|------|---------|-------------|
 | `files` | `string[]` | `{"project.json", "package.json"}` | File patterns to identify project root directories |
 | `ignore` | `string[]` | `{".git", "node_modules", "build"}` | Directory patterns to ignore during scanning |
+| `display.show_icons` | `boolean` | `true` | Show file type icons (📦 for package.json, 🦀 for Cargo.toml, etc.) |
+| `display.show_file_count` | `boolean` | `false` | Show file count instead of individual file names |
+| `display.compact_paths` | `boolean` | `true` | Use compact path display (parent/project format) |
 
 ### Example Configurations
 
@@ -119,6 +128,29 @@ require("nvim-monorepos").setup({
 require("nvim-monorepos").setup({
   files = { "package.json", "Cargo.toml", "go.mod", "pom.xml" },
   ignore = { ".git", "node_modules", "target", "vendor", "build" }
+})
+```
+
+#### Custom display options
+```lua
+require("nvim-monorepos").setup({
+  files = { "package.json", "Cargo.toml" },
+  ignore = { ".git", "node_modules", "target" },
+  display = {
+    show_icons = true,        -- Show icons: frontend/web-app │ 📦 package.json • 🔷 tsconfig.json
+    show_file_count = false,  -- Or show count: frontend/web-app (2 files)
+    compact_paths = true      -- Use parent/project format for long paths
+  }
+})
+```
+
+#### Minimal display (no icons)
+```lua
+require("nvim-monorepos").setup({
+  files = { "package.json" },
+  display = {
+    show_icons = false  -- Plain format: frontend/web-app [package.json, tsconfig.json]
+  }
 })
 ```
 
