@@ -1,51 +1,59 @@
-local status_ok, utils = pcall(require, "nvim-monorepos.utils")
-local status_ok_method, methods = pcall(require, "nvim-monorepos.methods")
-local status_ok_customcmds, customcmds = pcall(require, "nvim-monorepos.custom-commands")
+---nvim-monorepos: A simple file picker for monorepo projects
+---Finds files matching specific patterns in subdirectories and lists them using telescope.nvim
 
-if not status_ok or not status_ok_method or not status_ok_customcmds then return end
+local config = require("nvim-monorepos.config")
+local scanner = require("nvim-monorepos.scanner")
+local picker = require("nvim-monorepos.picker")
+local commands = require("nvim-monorepos.commands")
 
-local initial_directory = nil
-local root_directories_with_files = {}
 local M = {}
 
-M.find_files = methods.find_files(root_directories_with_files)
-M.find_in_files = methods.find_in_files(root_directories_with_files)
+---@type string[]|nil
+local project_directories = nil
+---@type table|nil
+local plugin_config = nil
 
---- @param options (table)? [optional] file name
-M.setup = function(options)
-  initial_directory = vim.fn.getcwd()
-  options = options or {
-    patterns = {}
-  }
-
-  local files = options.files
-  local ignore = options.ignore
-  local root = options.root
-
-
-  local patterns = {
-    files = { "project.json", "package.json" }, -- Replace with your file patterns
-    ignore = { ".git", "node_modules", "build" },
-    root = {}
-  }
-
-  if files and #files > 0 then
-    patterns["files"] = files
+---Find files in a selected project directory
+M.find_files = function()
+  if not project_directories or #project_directories == 0 then
+    vim.notify("nvim-monorepos: No project directories found. Run setup first.", vim.log.levels.WARN)
+    return
   end
+  picker.show_project_picker(project_directories, "find_files", plugin_config)
+end
 
-  if ignore and #ignore > 0 then
-    patterns["ignore"] = ignore
+---Search text in files within a selected project directory
+M.find_in_files = function()
+  if not project_directories or #project_directories == 0 then
+    vim.notify("nvim-monorepos: No project directories found. Run setup first.", vim.log.levels.WARN)
+    return
   end
+  picker.show_project_picker(project_directories, "find_in_files", plugin_config)
+end
 
-  if root and #root > 0 then
-    patterns["root"] = root
+---Setup the plugin with user configuration
+---@param user_opts table? Optional configuration table
+---@field user_opts.files string[]? File patterns to search for (default: {"project.json", "package.json"})
+---@field user_opts.ignore string[]? Directory patterns to ignore (default: {".git", "node_modules", "build"})
+M.setup = function(user_opts)
+  -- Get current working directory as the root for scanning
+  local root_directory = vim.fn.getcwd()
+  
+  -- Setup configuration with user options
+  plugin_config = config.setup(user_opts)
+  
+  -- Find all project directories based on configuration
+  project_directories = scanner.find_project_directories(root_directory, plugin_config)
+  
+  -- Setup user commands
+  commands.setup_commands(project_directories, plugin_config)
+  
+  -- Provide feedback about found projects
+  if #project_directories == 0 then
+    vim.notify("nvim-monorepos: No project directories found with the specified file patterns", vim.log.levels.WARN)
+  else
+    vim.notify(string.format("nvim-monorepos: Found %d project directories", #project_directories), vim.log.levels.INFO)
   end
-
-  local dirs = utils.find_subdirectories(initial_directory, patterns.ignore)
-  local subdirs = utils.filterDirectoriesWithPatterns(dirs, patterns.files)
-
-  root_directories_with_files = subdirs
-  customcmds.init(root_directories_with_files)
 end
 
 return M
