@@ -3,20 +3,20 @@ local M = {}
 
 local scanner = require("nvim-monorepos.scanner")
 
----@type table|nil
-local telescope_ok, telescope = pcall(require, "telescope")
-if not telescope_ok then
-  vim.notify("nvim-monorepos: telescope.nvim is required but not found", vim.log.levels.ERROR)
-  return M
-end
+---@type boolean, table|nil
+local ok_telescope, _ = pcall(require, "telescope")
+local ok_actions, actions = pcall(require, "telescope.actions")
+local ok_action_state, action_state = pcall(require, "telescope.actions.state")
+local ok_finders, finders = pcall(require, "telescope.finders")
+local ok_pickers, pickers = pcall(require, "telescope.pickers")
+local ok_builtin, builtin = pcall(require, "telescope.builtin")
+local ok_sorters, sorters = pcall(require, "telescope.sorters")
+local ok_themes, themes = pcall(require, "telescope.themes")
 
-local actions = require("telescope.actions")
-local action_state = require("telescope.actions.state")
-local finders = require("telescope.finders")
-local pickers = require("telescope.pickers")
-local builtin = require("telescope.builtin")
-local sorters = require("telescope.sorters")
-local themes = require("telescope.themes")
+if not ok_telescope or not ok_actions or not ok_action_state or not ok_finders or not ok_pickers or not ok_builtin or not ok_sorters or not ok_themes then
+  vim.notify("Telescope is not installed or some modules are missing", vim.log.levels.ERROR)
+  return
+end
 
 ---Create telescope picker for project selection
 ---@param project_directories string[] List of project directories
@@ -27,18 +27,18 @@ M.show_project_picker = function(project_directories, action_type, config)
     vim.notify("nvim-monorepos: No project directories found", vim.log.levels.WARN)
     return
   end
-  
+
   local root_directory = vim.fn.getcwd()
   local display_config = config.display or {}
-  
+
   -- Create display entries mapping display name to full path
   local entries = {}
   local display_items = {}
-  
+
   for _, directory in ipairs(project_directories) do
     local display_name = scanner.create_display_name(directory, root_directory)
     local project_files = scanner.get_project_files(directory, config.files)
-    
+
     -- Create a stylized display format based on configuration
     local file_indicators = ""
     if #project_files > 0 then
@@ -79,22 +79,32 @@ M.show_project_picker = function(project_directories, action_type, config)
         file_indicators = " [" .. table.concat(project_files, ", ") .. "]"
       end
     end
-    
+
     local full_display = display_name .. file_indicators
     table.insert(display_items, full_display)
     entries[full_display] = directory
   end
-  
+
   local function on_select(prompt_bufnr)
-    local selected = action_state.get_selected_entry().value
+    if not action_state then
+      vim.notify("Telescope is not installed or some modules are missing", vim.log.levels.ERROR)
+      return
+    end
+
+    local state = action_state.get_selected_entry()
+    if not state then
+      vim.notify("No entry selected", vim.log.levels.WARN)
+      return
+    end
+    local selected = state.value or ""
     local selected_directory = entries[selected]
     local display_name = scanner.create_display_name(selected_directory, root_directory)
-    
+
     actions.close(prompt_bufnr)
-    
+
     local title_prefix = display_config.show_icons ~= false and "📁 " or ""
     local search_prefix = display_config.show_icons ~= false and "🔍 " or ""
-    
+
     if action_type == "find_files" then
       builtin.find_files({
         prompt_title = title_prefix .. "Find files in " .. display_name,
@@ -107,13 +117,13 @@ M.show_project_picker = function(project_directories, action_type, config)
       })
     end
   end
-  
+
   local function attach_mappings(_, map)
     map("i", "<CR>", on_select)
     map("n", "<CR>", on_select)
     return true
   end
-  
+
   local finder = finders.new_table({
     results = display_items,
     entry_maker = function(entry)
@@ -124,9 +134,9 @@ M.show_project_picker = function(project_directories, action_type, config)
       }
     end
   })
-  
+
   local title_prefix = display_config.show_icons ~= false and "🚀 " or ""
-  
+
   pickers.new({}, themes.get_dropdown({
     finder = finder,
     prompt_title = title_prefix .. "Select Project",
