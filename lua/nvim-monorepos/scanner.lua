@@ -38,6 +38,7 @@ end
 ---@return string[] subdirectories List of found subdirectories
 M.find_subdirectories = function(root_directory, ignore_patterns)
   local subdirectories = {}
+
   local function scan_recursive(directory)
     if should_ignore_directory(directory, ignore_patterns) then
       return
