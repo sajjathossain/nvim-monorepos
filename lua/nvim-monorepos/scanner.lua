@@ -7,7 +7,7 @@ local M = {}
 ---@return boolean should_ignore True if directory should be ignored
 local function should_ignore_directory(path, ignore_patterns)
   for _, pattern in ipairs(ignore_patterns) do
-    if string.match(path, pattern) then
+    if string.find(path, pattern, 1, true) then
       return true
     end
   end
@@ -38,9 +38,10 @@ end
 ---@return string[] subdirectories List of found subdirectories
 M.find_subdirectories = function(root_directory, ignore_patterns)
   local subdirectories = {}
-  
+
   local function scan_recursive(directory)
     if should_ignore_directory(directory, ignore_patterns) then
+      print("Scanning 42:",vim.inspect(ignore_patterns))
       return
     end
     
