@@ -7,7 +7,7 @@ local M = {}
 ---@return boolean should_ignore True if directory should be ignored
 local function should_ignore_directory(path, ignore_patterns)
   for _, pattern in ipairs(ignore_patterns) do
-    if string.match(path, pattern) then
+    if string.find(path, pattern, 1, true) then
       return true
     end
   end
@@ -20,7 +20,7 @@ end
 ---@return boolean has_files True if directory contains matching files
 local function directory_has_files(directory, file_patterns)
   local files = vim.fn.readdir(directory)
-  
+
   for _, pattern in ipairs(file_patterns) do
     for _, file in ipairs(files) do
       if file == pattern then
@@ -28,7 +28,7 @@ local function directory_has_files(directory, file_patterns)
       end
     end
   end
-  
+
   return false
 end
 
@@ -38,25 +38,25 @@ end
 ---@return string[] subdirectories List of found subdirectories
 M.find_subdirectories = function(root_directory, ignore_patterns)
   local subdirectories = {}
-  
+
   local function scan_recursive(directory)
     if should_ignore_directory(directory, ignore_patterns) then
       return
     end
-    
+
     local items = vim.fn.readdir(directory)
-    
+
     for _, item in ipairs(items) do
       local path = directory .. '/' .. item
       local is_directory = vim.fn.isdirectory(path)
-      
+
       if is_directory == 1 and item ~= '.' and item ~= '..' then
         table.insert(subdirectories, path)
         scan_recursive(path)
       end
     end
   end
-  
+
   scan_recursive(root_directory)
   return subdirectories
 end
@@ -67,13 +67,13 @@ end
 ---@return string[] filtered_directories Directories containing the specified files
 M.filter_directories_with_files = function(directories, file_patterns)
   local filtered_directories = {}
-  
+
   for _, directory in ipairs(directories) do
     if directory_has_files(directory, file_patterns) then
       table.insert(filtered_directories, directory)
     end
   end
-  
+
   return filtered_directories
 end
 
@@ -88,14 +88,14 @@ end
 ---@param directory_path string Full directory path
 ---@param root_directory string Root directory being scanned
 ---@return string display_name Formatted display name with parent context
-M.create_display_name = function(directory_path, root_directory)
+M.create_display_name = function(directory_path, _)
   local relative_path = vim.fn.fnamemodify(directory_path, ':~:.')
-  
+
   -- Remove leading ./ if present
   if vim.startswith(relative_path, './') then
     relative_path = string.sub(relative_path, 3)
   end
-  
+
   -- If the path is too long, show parent/current format
   local parts = vim.split(relative_path, '/')
   if #parts > 3 then
@@ -125,7 +125,7 @@ end
 M.get_project_files = function(directory, file_patterns)
   local found_files = {}
   local files = vim.fn.readdir(directory)
-  
+
   for _, pattern in ipairs(file_patterns) do
     for _, file in ipairs(files) do
       if file == pattern then
@@ -133,7 +133,7 @@ M.get_project_files = function(directory, file_patterns)
       end
     end
   end
-  
+
   return found_files
 end
 
